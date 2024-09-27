@@ -9,6 +9,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+  ENV_FILE: ${{ secrets.ENV_FILE }}
 
 jobs:
   build-and-deploy:
@@ -16,7 +17,10 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
-    
+
+    - name: Configure kubectl
+      run: echo "$ENV_FILE" > .env
+      
     - name: Build Docker images
       run: |
         docker build -t $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }} -f Dockerfile.reverb .
@@ -37,6 +41,12 @@ jobs:
       
     - name: Configure kubectl
       run: echo "$KUBE_CONFIG" > kubeconfig.yaml
+
+    - name: Create Kubernetes Secrets
+      run: |
+        kubectl --kubeconfig=./kubeconfig.yaml create secret generic laravel-secrets --from-literal=app-key=${{ secrets.APP_KEY }}
+        kubectl --kubeconfig=./kubeconfig.yaml create secret generic mysql-secrets --from-literal=root-password=${{ secrets.MYSQL_ROOT_PASSWORD }} --from-literal=username=${{ secrets.MYSQL_USERNAME }} --from-literal=password=${{ secrets.MYSQL_PASSWORD }}
+        kubectl --kubeconfig=./kubeconfig.yaml create secret generic reverb-secrets --from-literal=app-id=${{ secrets.REVERB_APP_ID }} --from-literal=app-key=${{ secrets.REVERB_APP_KEY }} --from-literal=app-secret=${{ secrets.REVERB_APP_SECRET }}
       
     - name: Update Kubernetes deployments
       run: |
