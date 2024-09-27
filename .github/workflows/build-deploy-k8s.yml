@@ -1,0 +1,45 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Build Docker images
+      run: |
+        docker build -t $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }} -f Dockerfile.reverb .
+        docker build -t $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }} -f Dockerfile.nginx .
+        docker build -t $DOCKER_USERNAME/scoreboard-app:${{ github.sha }} -f Dockerfile .
+        
+    - name: Log in to Docker Hub
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        
+    - name: Push images to Docker Hub
+      run: |
+        docker push $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
+        docker push $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
+        docker push $DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
+        
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v1
+      
+    - name: Configure kubectl
+      run: echo "$KUBE_CONFIG" | base64 -d > kubeconfig.yaml
+      
+    - name: Update Kubernetes deployments
+      run: |
+        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-reverb scoreboard-reverb=$DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
+        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-nginx scoreboard-nginx=$DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
+        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-app scoreboard-app=$DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
