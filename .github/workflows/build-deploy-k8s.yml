@@ -23,18 +23,18 @@ jobs:
       
     - name: Build Docker images
       run: |
-        docker build -t $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }} -f Dockerfile.reverb .
-        docker build -t $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }} -f Dockerfile.nginx .
-        docker build -t $DOCKER_USERNAME/scoreboard-app:${{ github.sha }} -f Dockerfile .
+        docker build -t $DOCKER_USERNAME/scoreboard-reverb:latest -f Dockerfile.reverb .
+        docker build -t $DOCKER_USERNAME/scoreboard-nginx:latest -f Dockerfile.nginx .
+        docker build -t $DOCKER_USERNAME/scoreboard-app:latest -f Dockerfile .
         
     - name: Log in to Docker Hub
       run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         
     - name: Push images to Docker Hub
       run: |
-        docker push $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
-        docker push $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
-        docker push $DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
+        docker push $DOCKER_USERNAME/scoreboard-reverb:latest
+        docker push $DOCKER_USERNAME/scoreboard-nginx:latest
+        docker push $DOCKER_USERNAME/scoreboard-app:latest
         
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
