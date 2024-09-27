@@ -79,6 +79,25 @@ spec:
         ports:
         - containerPort: 8080
         env:
+        - name: APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: laravel-secrets
+              key: app-key
+        - name: DB_HOST
+          value: mysql-service
+        - name: DB_DATABASE
+          value: scoreboard
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: password
         - name: REVERB_APP_ID
           valueFrom:
             secretKeyRef:
