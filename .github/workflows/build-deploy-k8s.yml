@@ -9,7 +9,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-  ENV_FILE: ${{ secrets.ENV_FILE }}
+  ENV_FILE: ${{ vars.ENV_FILE }}
 
 jobs:
   build-and-deploy:
