@@ -53,6 +53,4 @@ jobs:
       
     - name: Update Kubernetes deployments
       run: |
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-reverb scoreboard-reverb=$DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-nginx scoreboard-nginx=$DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-app scoreboard-app=$DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
+        kubectl --kubeconfig=./kubeconfig.yaml apply -f kubernetes/laravel-k8s.yaml
