@@ -44,6 +44,9 @@ jobs:
 
     - name: Create Kubernetes Secrets
       run: |
+        kubectl --kubeconfig=./kubeconfig.yaml delete secret laravel-secrets --ignore-not-found
+        kubectl --kubeconfig=./kubeconfig.yaml delete secret mysql-secrets --ignore-not-found
+        kubectl --kubeconfig=./kubeconfig.yaml delete secret reverb-secrets --ignore-not-found
         kubectl --kubeconfig=./kubeconfig.yaml create secret generic laravel-secrets --from-literal=app-key=${{ secrets.APP_KEY }}
         kubectl --kubeconfig=./kubeconfig.yaml create secret generic mysql-secrets --from-literal=root-password=${{ secrets.MYSQL_ROOT_PASSWORD }} --from-literal=username=${{ secrets.MYSQL_USERNAME }} --from-literal=password=${{ secrets.MYSQL_PASSWORD }}
         kubectl --kubeconfig=./kubeconfig.yaml create secret generic reverb-secrets --from-literal=app-id=${{ secrets.REVERB_APP_ID }} --from-literal=app-key=${{ secrets.REVERB_APP_KEY }} --from-literal=app-secret=${{ secrets.REVERB_APP_SECRET }}
