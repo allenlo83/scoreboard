@@ -73,6 +73,22 @@ spec:
         image: allenlo83/scoreboard-nginx:latest
         ports:
         - containerPort: 80
+        env:
+        - name: REVERB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-id
+        - name: REVERB_APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-key
+        - name: REVERB_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-secret
 ---
 apiVersion: apps/v1
 kind: Deployment
