@@ -9,7 +9,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-  ENV_FILE: ${{ secrets.ENV_FILE }}
+  ENV_FILE: ${{ vars.ENV_FILE }}
 
 jobs:
   build-and-deploy:
@@ -23,18 +23,18 @@ jobs:
       
     - name: Build Docker images
       run: |
-        docker build -t $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }} -f Dockerfile.reverb .
-        docker build -t $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }} -f Dockerfile.nginx .
-        docker build -t $DOCKER_USERNAME/scoreboard-app:${{ github.sha }} -f Dockerfile .
+        docker build -t $DOCKER_USERNAME/scoreboard-reverb:latest -f Dockerfile.reverb .
+        docker build -t $DOCKER_USERNAME/scoreboard-nginx:latest -f Dockerfile.nginx .
+        docker build -t $DOCKER_USERNAME/scoreboard-app:latest -f Dockerfile .
         
     - name: Log in to Docker Hub
       run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         
     - name: Push images to Docker Hub
       run: |
-        docker push $DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
-        docker push $DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
-        docker push $DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
+        docker push $DOCKER_USERNAME/scoreboard-reverb:latest
+        docker push $DOCKER_USERNAME/scoreboard-nginx:latest
+        docker push $DOCKER_USERNAME/scoreboard-app:latest
         
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
@@ -53,6 +53,4 @@ jobs:
       
     - name: Update Kubernetes deployments
       run: |
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-reverb scoreboard-reverb=$DOCKER_USERNAME/scoreboard-reverb:${{ github.sha }}
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-nginx scoreboard-nginx=$DOCKER_USERNAME/scoreboard-nginx:${{ github.sha }}
-        kubectl --kubeconfig=./kubeconfig.yaml set image deployment/scoreboard-app scoreboard-app=$DOCKER_USERNAME/scoreboard-app:${{ github.sha }}
+        kubectl --kubeconfig=./kubeconfig.yaml apply -f kubernetes/laravel-k8s.yaml
