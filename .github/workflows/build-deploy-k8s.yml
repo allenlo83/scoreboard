@@ -58,6 +58,6 @@ jobs:
     - name: Update Kubernetes deployments
       run: |
         kubectl --kubeconfig=./kubeconfig.yaml apply -f kubernetes/laravel-k8s.yaml
-        kubectl rollout restart deployment scoreboard-reverb
-        kubectl rollout restart deployment scoreboard-nginx
-        kubectl rollout restart deployment scoreboard-app
+        kubectl --kubeconfig=./kubeconfig.yaml rollout restart deployment scoreboard-reverb
+        kubectl --kubeconfig=./kubeconfig.yaml rollout restart deployment scoreboard-nginx
+        kubectl --kubeconfig=./kubeconfig.yaml rollout restart deployment scoreboard-app
