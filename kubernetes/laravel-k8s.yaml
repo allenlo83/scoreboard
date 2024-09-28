@@ -38,6 +38,21 @@ spec:
             secretKeyRef:
               name: mysql-secrets
               key: password
+        - name: REVERB_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-id
+        - name: REVERB_APP_KEY
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-key
+        - name: REVERB_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: reverb-secrets
+              key: app-secret
 ---
 apiVersion: apps/v1
 kind: Deployment
